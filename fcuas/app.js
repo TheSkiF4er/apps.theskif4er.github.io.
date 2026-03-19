@@ -55,6 +55,12 @@ const refs = {
 
 document.addEventListener('DOMContentLoaded', init);
 
+function setVisibility(element, isVisible) {
+  if (!element) return;
+  element.hidden = !isVisible;
+  element.style.display = isVisible ? '' : 'none';
+}
+
 async function init() {
   refs.pageTitle.textContent = APP_CONFIG.appTitle || 'FPV 5.8 GHz Table';
   refs.appTitle.textContent = APP_CONFIG.appTitle || 'FPV 5.8 GHz Table';
@@ -107,9 +113,9 @@ function isConfigured() {
 }
 
 function showSetup(message) {
-  refs.setupCard.hidden = false;
-  refs.loginScreen.hidden = true;
-  refs.appScreen.hidden = true;
+  setVisibility(refs.setupCard, true);
+  setVisibility(refs.loginScreen, false);
+  setVisibility(refs.appScreen, false);
 
   if (message) {
     const note = document.createElement('p');
@@ -120,16 +126,19 @@ function showSetup(message) {
 }
 
 function showLogin() {
-  refs.setupCard.hidden = true;
-  refs.loginScreen.hidden = false;
-  refs.appScreen.hidden = true;
+  setVisibility(refs.setupCard, false);
+  setVisibility(refs.loginScreen, true);
+  setVisibility(refs.appScreen, false);
   refs.passwordInput.focus();
 }
 
 function showApp() {
-  refs.setupCard.hidden = true;
-  refs.loginScreen.hidden = true;
-  refs.appScreen.hidden = false;
+  hideLoginError();
+  refs.passwordInput.value = '';
+  setVisibility(refs.setupCard, false);
+  setVisibility(refs.loginScreen, false);
+  setVisibility(refs.appScreen, true);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function bindEvents() {
