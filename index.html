@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FPV Frequency Table</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="password-screen" class="password-screen">
+    <div class="password-card">
+      <h1>Доступ к таблице</h1>
+      <p>Введите пароль, чтобы открыть страницу.</p>
+      <form id="password-form">
+        <input id="password-input" type="password" placeholder="Пароль" autocomplete="current-password" />
+        <button type="submit">Открыть</button>
+      </form>
+      <p id="password-error" class="error-message" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <main id="app" class="app hidden">
+    <header class="page-header">
+      <div>
+        <h1>5.8GHz FPV Frequency Table</h1>
+        <p>Нажимайте на числовые ячейки, чтобы отмечать их красным цветом.</p>
+      </div>
+      <button id="reset-button" class="reset-button" type="button">Сбросить отметки</button>
+    </header>
+
+    <div class="table-wrap">
+      <table class="freq-table">
+        <thead>
+          <tr>
+            <th>Band</th>
+            <th>CH 1</th>
+            <th>CH 2</th>
+            <th>CH 3</th>
+            <th>CH 4</th>
+            <th>CH 5</th>
+            <th>CH 6</th>
+            <th>CH 7</th>
+            <th>CH 8</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Band - A</th>
+            <td class="toggle-cell" data-key="A-1">5865</td>
+            <td class="toggle-cell" data-key="A-2">5845</td>
+            <td class="toggle-cell" data-key="A-3">5825</td>
+            <td class="toggle-cell" data-key="A-4">5805</td>
+            <td class="toggle-cell" data-key="A-5">5785</td>
+            <td class="toggle-cell" data-key="A-6">5765</td>
+            <td class="toggle-cell" data-key="A-7">5745</td>
+            <td class="toggle-cell" data-key="A-8">5725</td>
+          </tr>
+          <tr>
+            <th scope="row">Band - b</th>
+            <td class="toggle-cell" data-key="B-1">5733</td>
+            <td class="toggle-cell" data-key="B-2">5752</td>
+            <td class="toggle-cell" data-key="B-3">5771</td>
+            <td class="toggle-cell" data-key="B-4">5790</td>
+            <td class="toggle-cell" data-key="B-5">5809</td>
+            <td class="toggle-cell" data-key="B-6">5828</td>
+            <td class="toggle-cell" data-key="B-7">5847</td>
+            <td class="toggle-cell" data-key="B-8">5866</td>
+          </tr>
+          <tr>
+            <th scope="row">Band - E</th>
+            <td class="toggle-cell" data-key="E-1">5705</td>
+            <td class="toggle-cell" data-key="E-2">5685</td>
+            <td class="toggle-cell" data-key="E-3">5665</td>
+            <td class="toggle-cell" data-key="E-4">5645</td>
+            <td class="toggle-cell" data-key="E-5">5885</td>
+            <td class="toggle-cell" data-key="E-6">5905</td>
+            <td class="toggle-cell" data-key="E-7">5925</td>
+            <td class="toggle-cell" data-key="E-8">5945</td>
+          </tr>
+          <tr>
+            <th scope="row">Band - F</th>
+            <td class="toggle-cell" data-key="F-1">5740</td>
+            <td class="toggle-cell" data-key="F-2">5760</td>
+            <td class="toggle-cell" data-key="F-3">5780</td>
+            <td class="toggle-cell" data-key="F-4">5800</td>
+            <td class="toggle-cell" data-key="F-5">5820</td>
+            <td class="toggle-cell" data-key="F-6">5840</td>
+            <td class="toggle-cell" data-key="F-7">5860</td>
+            <td class="toggle-cell" data-key="F-8">5880</td>
+          </tr>
+          <tr>
+            <th scope="row">Band - r</th>
+            <td class="toggle-cell" data-key="R-1">5658</td>
+            <td class="toggle-cell" data-key="R-2">5695</td>
+            <td class="toggle-cell" data-key="R-3">5732</td>
+            <td class="toggle-cell" data-key="R-4">5769</td>
+            <td class="toggle-cell" data-key="R-5">5806</td>
+            <td class="toggle-cell" data-key="R-6">5843</td>
+            <td class="toggle-cell" data-key="R-7">5880</td>
+            <td class="toggle-cell" data-key="R-8">5917</td>
+          </tr>
+          <tr>
+            <th scope="row">Band - U</th>
+            <td class="toggle-cell" data-key="U-1">5325</td>
+            <td class="toggle-cell" data-key="U-2">5348</td>
+            <td class="toggle-cell" data-key="U-3">5366</td>
+            <td class="toggle-cell" data-key="U-4">5384</td>
+            <td class="toggle-cell" data-key="U-5">5402</td>
+            <td class="toggle-cell" data-key="U-6">5420</td>
+            <td class="toggle-cell" data-key="U-7">5438</td>
+            <td class="toggle-cell" data-key="U-8">5456</td>
+          </tr>
+          <tr>
+            <th scope="row">Band - o</th>
+            <td class="toggle-cell" data-key="O-1">5474</td>
+            <td class="toggle-cell" data-key="O-2">5492</td>
+            <td class="toggle-cell" data-key="O-3">5510</td>
+            <td class="toggle-cell" data-key="O-4">5528</td>
+            <td class="toggle-cell" data-key="O-5">5546</td>
+            <td class="toggle-cell" data-key="O-6">5564</td>
+            <td class="toggle-cell" data-key="O-7">5582</td>
+            <td class="toggle-cell" data-key="O-8">5600</td>
+          </tr>
+          <tr>
+            <th scope="row">Band - L</th>
+            <td class="toggle-cell" data-key="L-1">5333</td>
+            <td class="toggle-cell" data-key="L-2">5373</td>
+            <td class="toggle-cell" data-key="L-3">5413</td>
+            <td class="toggle-cell" data-key="L-4">5453</td>
+            <td class="toggle-cell" data-key="L-5">5493</td>
+            <td class="toggle-cell" data-key="L-6">5533</td>
+            <td class="toggle-cell" data-key="L-7">5573</td>
+            <td class="toggle-cell" data-key="L-8">5613</td>
+          </tr>
+          <tr>
+            <th scope="row">Band - H</th>
+            <td class="toggle-cell" data-key="H-1">5653</td>
+            <td class="toggle-cell" data-key="H-2">5693</td>
+            <td class="toggle-cell" data-key="H-3">5733</td>
+            <td class="toggle-cell" data-key="H-4">5773</td>
+            <td class="toggle-cell" data-key="H-5">5813</td>
+            <td class="toggle-cell" data-key="H-6">5853</td>
+            <td class="toggle-cell" data-key="H-7">5893</td>
+            <td class="toggle-cell" data-key="H-8">5933</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
