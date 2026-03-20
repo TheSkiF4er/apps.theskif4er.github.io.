@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>demo.skif4er.ru — демо-платформа разработок SkiF4er</title>
+    <meta
+      name="description"
+      content="Живые демо, рабочие интерфейсы и инженерные сборки SkiF4er. Отдельная витрина для продуктов, CMS, движков и open-source лабораторий."
+    />
+    <meta name="theme-color" content="#0B0F14" />
+    <meta name="color-scheme" content="dark" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="demo.skif4er.ru" />
+    <meta property="og:title" content="demo.skif4er.ru — демо-платформа разработок SkiF4er" />
+    <meta
+      property="og:description"
+      content="Живые демо, рабочие интерфейсы и инженерные сборки без маркетингового шума."
+    />
+    <meta property="og:url" content="https://demo.skif4er.ru/" />
+    <meta property="og:image" content="https://demo.skif4er.ru/og-demo-home.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="demo.skif4er.ru — демо-платформа разработок SkiF4er" />
+    <meta
+      name="twitter:description"
+      content="Живые демо, рабочие интерфейсы и инженерные сборки SkiF4er."
+    />
+    <meta name="twitter:image" content="https://demo.skif4er.ru/og-demo-home.svg" />
+    <link rel="canonical" href="https://demo.skif4er.ru/" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <a class="brand" href="#top" aria-label="demo.skif4er.ru">
+          <span class="brand-mark">SF4</span>
+          <span>demo / skif4er</span>
+        </a>
+        <div class="nav-wrap">
+          <nav class="nav" aria-label="Основная навигация">
+            <a href="#showcase">Витрина</a>
+            <a href="#method">Подход</a>
+            <a href="#pipeline">Поток</a>
+            <a href="#contact">Контур</a>
+          </nav>
+          <a class="btn btn-small btn-secondary" href="https://skif4er.ru/">skif4er.ru</a>
+        </div>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="container hero-grid">
+          <div class="fade-in">
+            <div class="eyebrow">demo.skif4er.ru / live showcase</div>
+            <h1>Живые демо, рабочие интерфейсы и инженерные сборки без маркетингового шума.</h1>
+            <p class="lead">
+              demo.skif4er.ru — отдельная витрина разработок SkiF4er. Здесь показывается не обещание,
+              а рабочее состояние: интерфейсы, архитектурные решения, CMS-поверхности, tooling и
+              продуктовые эксперименты.
+            </p>
+            <div class="btns">
+              <a class="btn btn-primary" href="#showcase">Открыть витрину</a>
+              <a class="btn btn-secondary" href="https://github.com/TheSkiF4er">GitHub</a>
+              <a class="btn btn-ghost" href="https://docs.skif4er.ru/">GitBook</a>
+            </div>
+            <div class="hero-note">
+              Независимые системы. Открытый код. Сначала продукт, потом слова.
+            </div>
+          </div>
+
+          <aside class="hero-stage fade-in" aria-label="Панель статуса">
+            <div class="hero-grid-lines"></div>
+            <div class="console">
+              <div class="console-head">
+                <span class="dots"><span></span><span></span><span></span></span>
+                <span>DEMO / CONTROL PLANE</span>
+              </div>
+              <div class="console-panel">
+                <div class="console-list">
+                  <div class="console-row">
+                    <div class="console-key">host</div>
+                    <div class="console-value">demo.skif4er.ru</div>
+                  </div>
+                  <div class="console-row">
+                    <div class="console-key">operator</div>
+                    <div class="console-value">SkiF4er</div>
+                  </div>
+                  <div class="console-row">
+                    <div class="console-key">focus</div>
+                    <div class="console-value">CMS · systems · tooling · open source</div>
+                  </div>
+                  <div class="console-row">
+                    <div class="console-key">mode</div>
+                    <div class="console-value">show &gt; tell</div>
+                  </div>
+                  <div class="console-row">
+                    <div class="console-key">routing</div>
+                    <div class="console-value">demo → обзор → код → docs</div>
+                  </div>
+                </div>
+              </div>
+              <div class="mini-grid">
+                <div class="mini-card">
+                  <span>Showcase entries</span>
+                  <strong id="metric-demos">0</strong>
+                  <span>карточек в витрине</span>
+                </div>
+                <div class="mini-card">
+                  <span>Категории</span>
+                  <strong id="metric-cats">0</strong>
+                  <span>движки, CMS, фреймворки и labs</span>
+                </div>
+                <div class="mini-card">
+                  <span>Ссылки</span>
+                  <strong>3</strong>
+                  <span>обзор, код и документация на карточку</span>
+                </div>
+                <div class="mini-card">
+                  <span>Build step</span>
+                  <strong>0</strong>
+                  <span>статический контур под GitHub Pages</span>
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="method">
+        <div class="container">
+          <div class="section-head fade-in">
+            <div>
+              <div class="kicker">Подход</div>
+              <h2>Витрина должна показывать систему, а не объяснять её длинными абзацами.</h2>
+            </div>
+            <p class="section-copy">
+              Этот лендинг собран в том же тёмном минималистичном контуре, что и основной бренд: холодный акцент,
+              строгая сетка, короткие формулировки и инженерный тон. Всё рассчитано на GitHub Pages и не требует сборки.
+            </p>
+          </div>
+
+          <div class="grid-3">
+            <div class="card fade-in">
+              <div class="meta">01 / product first</div>
+              <h3>Сначала рабочее состояние</h3>
+              <p>
+                В демо-контуре пользователь должен увидеть продукт за секунды: интерфейс, состояние, ссылку на код
+                и понятный маршрут к документации.
+              </p>
+            </div>
+            <div class="card fade-in">
+              <div class="meta">02 / traceable</div>
+              <h3>Прозрачный переход в код</h3>
+              <p>
+                Каждая карточка ведёт не в пустой маркетинговый слой, а в обзор, репозиторий и docs. Демо должно быть
+                проверяемым и технически прослеживаемым.
+              </p>
+            </div>
+            <div class="card fade-in">
+              <div class="meta">03 / static-first</div>
+              <h3>Без лишней инфраструктуры</h3>
+              <p>
+                Чистый HTML, CSS и JavaScript. Никаких тяжёлых фреймворков и build-step, который усложняет публикацию
+                на GitHub Pages.
+              </p>
+            </div>
+          </div>
+
+          <div class="grid-2 split-gap top-gap">
+            <div class="card quote-card fade-in">
+              <div class="kicker">Сигнал</div>
+              <blockquote>
+                Демо должно открывать продукт за секунды, а не убеждать пользователя, что продукт существует.
+              </blockquote>
+              <cite>demo.skif4er.ru / static-first / GitHub Pages ready</cite>
+            </div>
+            <div class="card fade-in">
+              <div class="meta">Редактирование</div>
+              <h3>Витрина управляется через один файл.</h3>
+              <p>
+                Каталог карточек вынесен в <code>app.js</code>. Достаточно заменить названия, описания, теги и ссылки,
+                чтобы перевести текущую витрину из обзорного режима в live-demo режим без правки разметки.
+              </p>
+              <div class="tag-list">
+                <span class="tag">HTML</span>
+                <span class="tag">CSS</span>
+                <span class="tag">Vanilla JS</span>
+                <span class="tag">GitHub Pages</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="showcase">
+        <div class="container">
+          <div class="section-head fade-in">
+            <div>
+              <div class="kicker">Витрина</div>
+              <h2>Одна сетка для всех направлений: движки, CMS, экосистемы и лаборатории.</h2>
+            </div>
+            <p class="section-copy">
+              Ниже — стартовый контур из <span id="demo-count">0</span> карточек на базе текущей экосистемы SkiF4er.
+              Сейчас карточки открывают обзоры, GitHub и docs. Когда появятся live-demo URL, достаточно заменить
+              <code>primaryUrl</code> в <code>app.js</code>.
+            </p>
+          </div>
+
+          <div class="callout fade-in">
+            Подход намеренно прагматичный: даже если live-demo ещё не развернуто, карточка всё равно должна быть полезной
+            и вести в код, документацию или обзор продукта.
+          </div>
+
+          <div class="filter-bar fade-in" id="filters" aria-label="Фильтры витрины"></div>
+          <div class="demo-grid" id="demo-grid" aria-live="polite"></div>
+
+          <noscript>
+            <div class="callout">
+              Для интерактивной витрины нужен JavaScript. Базовый лендинг останется рабочим, но фильтры и каталог карточек
+              без JS не отрисуются.
+            </div>
+          </noscript>
+        </div>
+      </section>
+
+      <section id="pipeline">
+        <div class="container">
+          <div class="section-head fade-in">
+            <div>
+              <div class="kicker">Поток</div>
+              <h2>Каждая демо-точка должна вести пользователя в инженерный контур за несколько шагов.</h2>
+            </div>
+            <p class="section-copy">
+              Витрина не заканчивается на красивой карточке. Её задача — быстро довести человека до исходников,
+              документации и обратной связи.
+            </p>
+          </div>
+
+          <div class="grid-2">
+            <div class="card fade-in">
+              <div class="meta">Шаг 01</div>
+              <h3>Открыть демо или обзор</h3>
+              <p>Первая кнопка всегда отвечает за быстрый вход: live-demo, обзор продукта или страница системы.</p>
+            </div>
+            <div class="card fade-in">
+              <div class="meta">Шаг 02</div>
+              <h3>Сразу проверить код</h3>
+              <p>Вторая кнопка должна вести в GitHub без обходных маршрутов и скрытых лендингов.</p>
+            </div>
+            <div class="card fade-in">
+              <div class="meta">Шаг 03</div>
+              <h3>Понять контекст через docs</h3>
+              <p>Третья кнопка — это документация, заметки по архитектуре или точка входа в экосистему.</p>
+            </div>
+            <div class="card fade-in">
+              <div class="meta">Шаг 04</div>
+              <h3>Вернуться с фидбеком</h3>
+              <p>После просмотра человек должен легко выйти в Telegram, Discord или GitHub issues.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="container">
+          <div class="card cta fade-in">
+            <div>
+              <div class="kicker">Контур</div>
+              <h2>Одна витрина. Три точки входа. Ноль лишнего шума.</h2>
+              <p class="section-copy">
+                Даже между релизами сайт остаётся полезным: обзор продукта, кодовая база и docs работают как единая
+                поверхность для тех, кто хочет посмотреть систему в деле.
+              </p>
+            </div>
+            <div class="btns">
+              <a class="btn btn-primary" href="https://skif4er.ru/">Основной сайт</a>
+              <a class="btn btn-secondary" href="https://docs.skif4er.ru/">GitBook</a>
+              <a class="btn btn-secondary" href="https://t.me/sf4blog">Telegram</a>
+              <a class="btn btn-ghost" href="https://discord.gg/E52DxpShQy">Discord</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer id="contact">
+      <div class="container footer-copy">
+        <div>© <span id="year"></span> SkiF4er / demo.skif4er.ru / open-source showcase.</div>
+        <div class="footer-links">
+          <a href="https://skif4er.ru/">Site</a>
+          <a href="https://github.com/TheSkiF4er">GitHub</a>
+          <a href="https://docs.skif4er.ru/">GitBook</a>
+          <a href="https://t.me/sf4blog">Telegram</a>
+          <a href="https://discord.gg/E52DxpShQy">Discord</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
