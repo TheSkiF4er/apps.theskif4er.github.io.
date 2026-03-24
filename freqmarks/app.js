@@ -12,10 +12,12 @@ const DEFAULT_BANDS = [
   { key: 'E', label: 'Band - E', channels: [5705, 5685, 5665, 5645, 5885, 5905, 5925, 5945] },
   { key: 'F', label: 'Band - F', channels: [5740, 5760, 5780, 5800, 5820, 5840, 5860, 5880] },
   { key: 'R', label: 'Band - R', channels: [5658, 5695, 5732, 5769, 5806, 5843, 5880, 5917] },
+  { key: 'D', label: 'Band - D', channels: [5362, 5399, 5436, 5473, 5510, 5547, 5584, 5621] },
   { key: 'U', label: 'Band - U', channels: [5325, 5348, 5366, 5384, 5402, 5420, 5438, 5456] },
   { key: 'O', label: 'Band - O', channels: [5474, 5492, 5510, 5528, 5546, 5564, 5582, 5600] },
   { key: 'L', label: 'Band - L', channels: [5333, 5373, 5413, 5453, 5493, 5533, 5573, 5613] },
   { key: 'H', label: 'Band - H', channels: [5653, 5693, 5733, 5773, 5813, 5853, 5893, 5933] },
+  { key: 'X', label: 'Band - X', channels: [4990, 5020, 5050, 5080, 5110, 5140, 5170, 5200] },
 ];
 
 const state = {
