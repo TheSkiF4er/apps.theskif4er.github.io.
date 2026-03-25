@@ -5,6 +5,13 @@ const DEFAULT_COLOR = normalizeHex(APP_CONFIG.defaultColor) || '#D32F2F';
 const SESSION_KEY = 'fpv-table-access-session';
 const ADMIN_HEADER_NAME = 'x-freqmarks-access-key';
 const APP_TITLE = String(APP_CONFIG.appTitle || 'Частотные отметки').trim() || 'Частотные отметки';
+const BOARD_STATUS_OPTIONS = [
+  { value: 'ready', label: 'Готов' },
+  { value: 'destroyed', label: 'Уничтожен' },
+  { value: 'lost', label: 'Утерян' },
+];
+const BOARD_STATUS_LABELS = Object.fromEntries(BOARD_STATUS_OPTIONS.map((item) => [item.value, item.label]));
+const DEFAULT_BOARD_STATUS = BOARD_STATUS_OPTIONS[0].value;
 
 const DEFAULT_BANDS = [
   { key: 'A', label: 'Band - A', channels: [5865, 5845, 5825, 5805, 5785, 5765, 5745, 5725] },
@@ -62,6 +69,7 @@ const refs = {
   currentColorPreview: document.getElementById('current-color-preview'),
   legendText: document.getElementById('legend-text'),
   addLegendButton: document.getElementById('add-legend-button'),
+  exportExcelButton: document.getElementById('export-excel-button'),
   resetButton: document.getElementById('reset-button'),
   logoutButton: document.getElementById('logout-button'),
   clearLegendButton: document.getElementById('clear-legend-button'),
@@ -348,6 +356,7 @@ function bindEvents() {
   });
 
   refs.addNoteButton.addEventListener('click', saveNoteFromForm);
+  refs.exportExcelButton?.addEventListener('click', exportAllDataToExcel);
 
   refs.resetButton.addEventListener('click', async () => {
     const ok = window.confirm('Удалить все отметки у ячеек?');
@@ -651,7 +660,7 @@ async function loadLegend() {
 async function loadLegendModels() {
   const { data, error } = await state.supabase
     .from('legend_models')
-    .select('id, color, model_name, model_number, sort_order')
+    .select('id, color, model_name, model_number, status, sort_order')
     .order('color', { ascending: true })
     .order('sort_order', { ascending: true })
     .order('id', { ascending: true });
@@ -1282,6 +1291,7 @@ function mapLegendModel(item) {
     id: item.id,
     modelName: String(item.model_name || ''),
     modelNumber: String(item.model_number || ''),
+    status: normalizeBoardStatus(item.status),
     sortOrder: Number.isFinite(Number(item.sort_order)) ? Number(item.sort_order) : 0,
   };
 }
@@ -1293,7 +1303,7 @@ function getLegendModels(color) {
 
 function buildLegendModelsSummary(color) {
   return getLegendModels(color)
-    .map((item) => `${item.modelName} — ${item.modelNumber}`)
+    .map((item) => `${item.modelName} — ${item.modelNumber} [${getBoardStatusLabel(item.status)}]`)
     .join('\n');
 }
 
@@ -1306,6 +1316,7 @@ function upsertLegendModelState(color, model) {
     id: model.id,
     modelName: String(model.modelName || ''),
     modelNumber: String(model.modelNumber || ''),
+    status: normalizeBoardStatus(model.status),
     sortOrder: Number.isFinite(Number(model.sortOrder)) ? Number(model.sortOrder) : 0,
   };
   const existingIndex = bucket.findIndex((item) => item.id === nextModel.id);
@@ -1318,6 +1329,39 @@ function upsertLegendModelState(color, model) {
 
   bucket.sort((a, b) => a.sortOrder - b.sortOrder || a.id - b.id);
   state.legendModels[normalizedColor] = bucket;
+}
+
+function normalizeBoardStatus(value) {
+  const prepared = String(value || '').trim().toLowerCase();
+  return BOARD_STATUS_LABELS[prepared] ? prepared : DEFAULT_BOARD_STATUS;
+}
+
+function getBoardStatusLabel(status) {
+  return BOARD_STATUS_LABELS[normalizeBoardStatus(status)] || BOARD_STATUS_LABELS[DEFAULT_BOARD_STATUS];
+}
+
+function createBoardStatusSelect(selectedStatus = DEFAULT_BOARD_STATUS) {
+  const select = document.createElement('select');
+  select.className = 'text-input';
+
+  BOARD_STATUS_OPTIONS.forEach((option) => {
+    const node = document.createElement('option');
+    node.value = option.value;
+    node.textContent = option.label;
+    select.append(node);
+  });
+
+  select.value = normalizeBoardStatus(selectedStatus);
+  return select;
+}
+
+function createBoardStatusBadge(status) {
+  const normalizedStatus = normalizeBoardStatus(status);
+  const badge = document.createElement('span');
+  badge.className = 'legend-model-status-badge';
+  badge.dataset.status = normalizedStatus;
+  badge.textContent = getBoardStatusLabel(normalizedStatus);
+  return badge;
 }
 
 function removeLegendModelState(color, modelId) {
@@ -1433,13 +1477,13 @@ function renderLegend() {
 
     const modelsTitle = document.createElement('h3');
     modelsTitle.className = 'legend-models__title';
-    modelsTitle.textContent = 'Модели для этого цвета';
+    modelsTitle.textContent = 'Борты для этого цвета';
 
     const modelsHint = document.createElement('p');
     modelsHint.className = 'muted small';
     modelsHint.textContent = admin
-      ? 'Добавляйте пары «Название модели — номер». Их увидят все пользователи.'
-      : 'Список моделей и номеров для выбранного цвета.';
+      ? 'Добавляйте борты, указывайте номер и статус. Их увидят все пользователи.'
+      : 'Список бортов, номеров и статусов для выбранного цвета.';
 
     modelsHeader.append(modelsTitle, modelsHint);
 
@@ -1454,7 +1498,7 @@ function renderLegend() {
 
       const head = document.createElement('thead');
       const headRow = document.createElement('tr');
-      ['Название модели', 'Номер'].forEach((titleText) => {
+      ['Название модели', 'Номер', 'Статус'].forEach((titleText) => {
         const th = document.createElement('th');
         th.textContent = titleText;
         headRow.append(th);
@@ -1488,13 +1532,23 @@ function renderLegend() {
           numberInput.className = 'text-input legend-model-input';
           numberInput.value = model.modelNumber;
           numberInput.placeholder = 'Номер';
-          numberInput.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-              event.preventDefault();
-              updateLegendModel(model.id, color, nameInput.value, numberInput.value, model.sortOrder);
-            }
-          });
           numberCell.append(numberInput);
+
+          const statusCell = document.createElement('td');
+          const statusSelect = createBoardStatusSelect(model.status);
+          statusSelect.classList.add('legend-model-status-select');
+          const handleSave = () => updateLegendModel(model.id, color, nameInput.value, numberInput.value, statusSelect.value, model.sortOrder);
+
+          [nameInput, numberInput].forEach((inputNode) => {
+            inputNode.addEventListener('keydown', (event) => {
+              if (event.key === 'Enter') {
+                event.preventDefault();
+                handleSave();
+              }
+            });
+          });
+          statusSelect.addEventListener('change', handleSave);
+          statusCell.append(statusSelect);
 
           const actionsCell = document.createElement('td');
           const actions = document.createElement('div');
@@ -1504,7 +1558,7 @@ function renderLegend() {
           saveButton.type = 'button';
           saveButton.className = 'secondary-button';
           saveButton.textContent = 'Сохранить';
-          saveButton.addEventListener('click', () => updateLegendModel(model.id, color, nameInput.value, numberInput.value, model.sortOrder));
+          saveButton.addEventListener('click', handleSave);
 
           const deleteButton = document.createElement('button');
           deleteButton.type = 'button';
@@ -1514,13 +1568,15 @@ function renderLegend() {
 
           actions.append(saveButton, deleteButton);
           actionsCell.append(actions);
-          row.append(nameCell, numberCell, actionsCell);
+          row.append(nameCell, numberCell, statusCell, actionsCell);
         } else {
           const nameCell = document.createElement('td');
           nameCell.textContent = model.modelName;
           const numberCell = document.createElement('td');
           numberCell.textContent = model.modelNumber;
-          row.append(nameCell, numberCell);
+          const statusCell = document.createElement('td');
+          statusCell.append(createBoardStatusBadge(model.status));
+          row.append(nameCell, numberCell, statusCell);
         }
 
         body.append(row);
@@ -1532,7 +1588,7 @@ function renderLegend() {
     } else {
       const empty = document.createElement('p');
       empty.className = 'muted small legend-models-empty';
-      empty.textContent = 'Для этого цвета пока нет добавленных моделей.';
+      empty.textContent = 'Для этого цвета пока нет добавленных бортов.';
       modelsSection.append(modelsHeader, empty);
     }
 
@@ -1550,29 +1606,35 @@ function renderLegend() {
       numberInput.className = 'text-input';
       numberInput.placeholder = 'Номер';
 
+      const statusSelect = createBoardStatusSelect(DEFAULT_BOARD_STATUS);
+      statusSelect.classList.add('legend-model-status-select');
+
       const addButton = document.createElement('button');
       addButton.type = 'button';
       addButton.className = 'primary-button';
-      addButton.textContent = 'Добавить модель';
+      addButton.textContent = 'Добавить борт';
 
       const handleAdd = async () => {
-        const saved = await addLegendModel(color, nameInput.value, numberInput.value);
+        const saved = await addLegendModel(color, nameInput.value, numberInput.value, statusSelect.value);
         if (saved) {
           nameInput.value = '';
           numberInput.value = '';
+          statusSelect.value = DEFAULT_BOARD_STATUS;
           nameInput.focus();
         }
       };
 
       addButton.addEventListener('click', handleAdd);
-      numberInput.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
-          event.preventDefault();
-          handleAdd();
-        }
+      [numberInput, statusSelect].forEach((field) => {
+        field.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            handleAdd();
+          }
+        });
       });
 
-      addForm.append(nameInput, numberInput, addButton);
+      addForm.append(nameInput, numberInput, statusSelect, addButton);
       modelsSection.append(addForm);
     }
 
@@ -1581,12 +1643,13 @@ function renderLegend() {
   });
 }
 
-async function addLegendModel(color, modelName, modelNumber) {
+async function addLegendModel(color, modelName, modelNumber, status = DEFAULT_BOARD_STATUS) {
   if (!requireAdminAccess()) return false;
 
   const normalizedColor = normalizeHex(color);
   const preparedName = String(modelName || '').trim();
   const preparedNumber = String(modelNumber || '').trim();
+  const preparedStatus = normalizeBoardStatus(status);
 
   if (!normalizedColor || !state.legend[normalizedColor]) {
     showMessage('Сначала сохраните подпись для выбранного цвета.', 'error');
@@ -1608,9 +1671,10 @@ async function addLegendModel(color, modelName, modelNumber) {
         color: normalizedColor,
         model_name: preparedName,
         model_number: preparedNumber,
+        status: preparedStatus,
         sort_order: lastSortOrder + 1,
       })
-      .select('id, color, model_name, model_number, sort_order')
+      .select('id, color, model_name, model_number, status, sort_order')
       .single();
 
     if (error) throw error;
@@ -1619,21 +1683,22 @@ async function addLegendModel(color, modelName, modelNumber) {
     upsertLegendModelState(savedColor, mapLegendModel(data));
     renderLegend();
     renderMarks();
-    showMessage('Модель добавлена.', 'success');
+    showMessage('Борт добавлен.', 'success');
     return true;
   } catch (error) {
     console.error(error);
-    showMessage('Не удалось добавить модель.', 'error');
+    showMessage('Не удалось добавить борт.', 'error');
     return false;
   }
 }
 
-async function updateLegendModel(modelId, color, modelName, modelNumber, sortOrder = 0) {
+async function updateLegendModel(modelId, color, modelName, modelNumber, status = DEFAULT_BOARD_STATUS, sortOrder = 0) {
   if (!requireAdminAccess()) return false;
 
   const normalizedColor = normalizeHex(color);
   const preparedName = String(modelName || '').trim();
   const preparedNumber = String(modelNumber || '').trim();
+  const preparedStatus = normalizeBoardStatus(status);
 
   if (!normalizedColor || !modelId) {
     showMessage('Не удалось определить запись модели.', 'error');
@@ -1651,6 +1716,7 @@ async function updateLegendModel(modelId, color, modelName, modelNumber, sortOrd
       .update({
         model_name: preparedName,
         model_number: preparedNumber,
+        status: preparedStatus,
         sort_order: Number.isFinite(Number(sortOrder)) ? Number(sortOrder) : 0,
       })
       .eq('id', modelId);
@@ -1661,15 +1727,16 @@ async function updateLegendModel(modelId, color, modelName, modelNumber, sortOrd
       id: modelId,
       modelName: preparedName,
       modelNumber: preparedNumber,
+      status: preparedStatus,
       sortOrder,
     });
     renderLegend();
     renderMarks();
-    showMessage('Модель обновлена.', 'success');
+    showMessage('Борт обновлен.', 'success');
     return true;
   } catch (error) {
     console.error(error);
-    showMessage('Не удалось обновить модель.', 'error');
+    showMessage('Не удалось обновить борт.', 'error');
     return false;
   }
 }
@@ -1688,11 +1755,11 @@ async function deleteLegendModel(modelId, color) {
     removeLegendModelState(color, modelId);
     renderLegend();
     renderMarks();
-    showMessage('Модель удалена.', 'success');
+    showMessage('Борт удален.', 'success');
     return true;
   } catch (error) {
     console.error(error);
-    showMessage('Не удалось удалить модель.', 'error');
+    showMessage('Не удалось удалить борт.', 'error');
     return false;
   }
 }
@@ -1799,6 +1866,137 @@ function getFrequencyByCellId(cellId) {
   const [bandKey, channelNumber] = String(cellId || '').split('-');
   const band = state.bands.find((item) => item.key === bandKey);
   return band?.channels?.[Number(channelNumber) - 1] ?? '';
+}
+
+function formatExportTimestamp() {
+  const now = new Date();
+  const pad = (value) => String(value).padStart(2, '0');
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}_${pad(now.getHours())}-${pad(now.getMinutes())}`;
+}
+
+function slugifyFilePart(value) {
+  return String(value || 'freqmarks')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9а-яё]+/gi, '-')
+    .replace(/^-+|-+$/g, '') || 'freqmarks';
+}
+
+function createSheet(headers, rows) {
+  const worksheet = window.XLSX.utils.aoa_to_sheet([headers, ...rows]);
+  const range = window.XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
+  const widths = headers.map((header, columnIndex) => {
+    const values = [header, ...rows.map((row) => row[columnIndex] ?? '')];
+    const maxLength = values.reduce((current, value) => Math.max(current, String(value).length), 0);
+    return { wch: Math.min(Math.max(maxLength + 2, 12), 42) };
+  });
+  worksheet['!cols'] = widths;
+  worksheet['!autofilter'] = { ref: window.XLSX.utils.encode_range(range) };
+  return worksheet;
+}
+
+function getLegendEntryRows() {
+  return Object.entries(state.legend)
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([color, label]) => [color, label, getLegendModels(color).length]);
+}
+
+function getLegendModelRows() {
+  return Object.entries(state.legendModels)
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .flatMap(([color, models]) => models.map((model) => [
+      color,
+      state.legend[color] || '',
+      model.modelName,
+      model.modelNumber,
+      getBoardStatusLabel(model.status),
+      model.id,
+      model.sortOrder,
+    ]));
+}
+
+function getFrequencyRows() {
+  return state.bands.flatMap((band) => band.channels.map((frequency, index) => {
+    const cellId = `${band.key}-${index + 1}`;
+    const color = state.marks[cellId] || '';
+    return [
+      band.key,
+      band.label,
+      index + 1,
+      cellId,
+      frequency,
+      color,
+      color ? state.legend[color] || '' : '',
+      color ? getLegendModels(color).map((item) => `${item.modelName} — ${item.modelNumber} [${getBoardStatusLabel(item.status)}]`).join('; ') : '',
+    ];
+  }));
+}
+
+function getNotesRows() {
+  return state.notes.map((note) => [note.id, note.title, note.content, formatDateTime(note.createdAt), formatDateTime(note.updatedAt)]);
+}
+
+async function exportAllDataToExcel() {
+  if (!window.XLSX?.utils?.book_new) {
+    showMessage('Библиотека Excel не загрузилась. Обновите страницу и попробуйте снова.', 'error');
+    return;
+  }
+
+  const button = refs.exportExcelButton;
+  if (button) {
+    button.disabled = true;
+    button.textContent = 'Экспорт...';
+  }
+
+  try {
+    const workbook = window.XLSX.utils.book_new();
+
+    window.XLSX.utils.book_append_sheet(workbook, createSheet(
+      ['Параметр', 'Значение'],
+      [
+        ['Название страницы', APP_TITLE],
+        ['Роль текущего сеанса', getAccessRoleMeta(state.accessRole).badge],
+        ['Минимальный шаг частот', state.settings.minFrequencyGap],
+        ['Цветов в легенде', Object.keys(state.legend).length],
+        ['Бортов', getLegendModelRows().length],
+        ['Отмеченных ячеек', Object.keys(state.marks).length],
+        ['Заметок', state.notes.length],
+        ['Дата экспорта', new Date().toLocaleString('ru-RU')],
+      ],
+    ), 'Сводка');
+
+    window.XLSX.utils.book_append_sheet(workbook, createSheet(
+      ['Band key', 'Band', 'Канал', 'Cell ID', 'Частота', 'Цвет', 'Подпись цвета', 'Борты этого цвета'],
+      getFrequencyRows(),
+    ), 'Частоты');
+
+    window.XLSX.utils.book_append_sheet(workbook, createSheet(
+      ['Цвет', 'Подпись', 'Количество бортов'],
+      getLegendEntryRows(),
+    ), 'Легенда');
+
+    window.XLSX.utils.book_append_sheet(workbook, createSheet(
+      ['Цвет', 'Подпись цвета', 'Название модели', 'Номер', 'Статус', 'ID', 'Порядок'],
+      getLegendModelRows(),
+    ), 'Борты');
+
+    window.XLSX.utils.book_append_sheet(workbook, createSheet(
+      ['ID', 'Заголовок', 'Текст', 'Создано', 'Обновлено'],
+      getNotesRows(),
+    ), 'Заметки');
+
+    const filename = `${slugifyFilePart(APP_TITLE)}-export-${formatExportTimestamp()}.xlsx`;
+    window.XLSX.writeFile(workbook, filename, { compression: true });
+    showMessage('Экспорт Excel готов.', 'success');
+  } catch (error) {
+    console.error(error);
+    showMessage('Не удалось сформировать Excel-файл.', 'error');
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.textContent = 'Экспорт в Excel';
+    }
+  }
 }
 
 let messageTimer = null;

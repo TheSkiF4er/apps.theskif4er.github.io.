@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Частотные отметки</title>
-  <link rel="stylesheet" href="./styles.css?v=20260324b" />
+  <link rel="stylesheet" href="./styles.css?v=20260325a" />
 </head>
 <body data-screen="login">
   <main class="page-shell">
@@ -43,6 +43,9 @@
         </form>
 
         <p id="login-error" class="inline-message error" hidden></p>
+        <p class="muted small">
+          По умолчанию в SQL-файле заданы ключи: администратор <code>fpv58</code>, пользователь <code>fpv29</code>. Их можно заменить.
+        </p>
       </div>
     </section>
 
@@ -64,6 +67,7 @@
         </div>
 
         <div class="header-actions">
+          <button id="export-excel-button" class="secondary-button" type="button">Экспорт в Excel</button>
           <button id="reset-button" class="secondary-button" type="button">Сбросить отметки</button>
           <button id="logout-button" class="ghost-button" type="button">Выйти</button>
         </div>
@@ -198,6 +202,7 @@
     </section>
   </main>
 
-  <script type="module" src="./app.js?v=20260324b"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script type="module" src="./app.js?v=20260325a"></script>
 </body>
 </html>
